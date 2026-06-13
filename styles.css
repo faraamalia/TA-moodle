@@ -1,0 +1,396 @@
+/* ═══════════════════════════════════════════
+   CHAT LOG CONTAINER
+═══════════════════════════════════════════ */
+.block_openai_chat #openai_chat_log {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;          /* jarak antar bubble — pakai gap, bukan margin */
+    max-height: 20rem;
+    overflow-y: scroll;
+    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+}
+
+.block_openai_chat #openai_chat_log p {
+    margin: 0;
+}
+
+.block_openai_chat #openai_chat_log a {
+    color: white;
+    text-decoration: underline;
+}
+
+/* ═══════════════════════════════════════════
+   CONTROL BAR
+═══════════════════════════════════════════ */
+.block_openai_chat #control_bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.block_openai_chat #control_bar button {
+    transition: filter 0.2s ease, background-color 0.3s ease;
+    border: none;
+    border-radius: 0.5rem;
+    width: 2.5rem;
+    cursor: pointer;
+}
+
+.block_openai_chat #control_bar button:hover {
+    filter: brightness(0.8);
+}
+
+/* --- Tombol Submit (Send) --- */
+.block_openai_chat #control_bar #go,
+.openai_input_submit_btn {
+    background-color: #075497;
+    color: white;
+    border-radius: 0 0.5rem 0.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.openai_input_submit_btn:hover,
+.block_openai_chat #control_bar #go:hover {
+    background-color: #06457c !important;
+}
+
+/* --- Tombol New Chat (Refresh) --- */
+.openai_input_refresh_btn {
+    background-color: #e4e7eb;
+    color: #333333;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.openai_input_refresh_btn:hover {
+    background-color: #caced1 !important;
+}
+
+/* --- Tombol Popout (Expand) --- */
+.block_openai_chat .openai_input_popout_btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.5rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 99rem;
+    padding: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    z-index: 2;
+    background-color: #075497;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.block_openai_chat .openai_input_popout_btn:hover {
+    background-color: #06457c;
+}
+
+/* --- Ukuran khusus untuk ikon panah (Expand) --- */
+.block_openai_chat .icon-expand img,
+.block_openai_chat .icon-expand svg {
+    width: 95%; /* Ubah angka ini khusus untuk mengecilkan/membesarkan panah */
+    height: auto;
+}
+
+/* --- Ukuran khusus untuk ikon silang (Close) --- */
+.block_openai_chat .icon-close img,
+.block_openai_chat .icon-close svg {
+    width: 100%;
+    height: auto; /* Ubah angka ini khusus untuk mengecilkan/membesarkan silang */
+    /* Tambahan opsional jika posisinya kurang ke tengah: */
+    /* margin-top: 2px; */ 
+}
+
+.openai_input_submit_btn_icon {
+    width: 100%;
+    height: auto;
+}
+.openai_input_refresh_btn_icon {
+    width: 75%;
+    height: auto;
+}
+
+/* ═══════════════════════════════════════════
+   INPUT BAR
+═══════════════════════════════════════════ */
+.openai_input_bar {
+    display: flex;
+    width: 100%;
+}
+
+.block_openai_chat img {
+    transform: scale(0.7);
+}
+
+.block_openai_chat #openai_input,
+.openai_input_bar textarea,
+.openai_input_bar input {
+    padding: 0.5rem;
+    border-radius: 0.5rem 0 0 0.5rem;
+    border: 0.5px solid #075497;
+    width: 100%;
+    transition: background 0.4s ease;
+    resize: vertical;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.block_openai_chat #openai_input.error {
+    border: 1px solid red;
+}
+
+/* ═══════════════════════════════════════════
+   BUBBLE PESAN — BASE
+═══════════════════════════════════════════ */
+.block_openai_chat .openai_message {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    width: fit-content;
+    max-width: 85%;
+    position: relative;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    animation: block_openai_chat_popup 0.4s cubic-bezier(0.87, 0, 0.13, 1);
+
+    /* label nama di atas bubble */
+    margin-top: 1.4rem;
+}
+
+/* label nama (Assistant / User) */
+.block_openai_chat .openai_message:before {
+    position: absolute;
+    top: -1.3rem;
+    left: 0;
+    color: #555;
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0;
+    white-space: nowrap;
+    animation: block_openai_chat_fade-in 0.4s ease 0.4s forwards;
+}
+
+/* --- Bubble User (kanan) --- */
+.block_openai_chat .openai_message.user {
+    background: #e8f0fe;
+    color: #1a1a1a;
+    align-self: flex-end;
+    margin-left: auto;
+    margin-right: 0.5rem;
+    text-align: left;
+}
+
+.block_openai_chat .openai_message.user:before {
+    right: 0;
+    left: unset;
+    text-align: right;
+}
+
+/* --- Bubble Assistant/Bot (kiri) --- */
+.block_openai_chat .openai_message.bot {
+    background: #075497;
+    color: #ffffff;
+    align-self: flex-start;
+    margin-left: 0.5rem;
+}
+
+/* --- Loading state --- */
+.block_openai_chat .openai_message.loading {
+    animation: block_openai_chat_thinking 1s ease infinite;
+}
+
+.block_openai_chat .openai_message.loading:before {
+    animation: none;
+    opacity: 0;
+}
+
+/* ═══════════════════════════════════════════
+   ONBOARDING MESSAGE
+═══════════════════════════════════════════ */
+.block_openai_chat .onboarding_message {
+    background: #075497;
+    color: #ffffff;
+    align-self: flex-start;
+    margin-left: 0.5rem;
+    
+    /* UBAH: Kembalikan margin-top agar ada ruang untuk teks label */
+    margin-top: 1.4rem !important; 
+    
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    width: fit-content;
+    max-width: 85%;
+    
+    /* TAMBAHAN: Wajib agar label tidak lari dari bubble */
+    position: relative; 
+}
+
+/* Memunculkan kembali label "Assistant" */
+.block_openai_chat .onboarding_message:before {
+    display: block; /* UBAH: Munculkan kembali */
+    content: "Assistant"; /* TAMBAHAN: Tulis teks labelnya secara manual */
+    position: absolute;
+    top: -1.3rem;
+    left: 0;
+    color: #555;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════
+   TOGGLE IKON POPOUT / CLOSE
+═══════════════════════════════════════════ */
+
+/* 1. Kondisi Default (Layar Kecil) */
+.block_openai_chat .icon-expand {
+    display: flex; /* Tampilkan ikon panah */
+}
+.block_openai_chat .icon-close {
+    display: none; /* Sembunyikan ikon silang */
+}
+
+/* 2. Kondisi Expanded (Mode Popout Aktif) */
+.block_openai_chat.expanded .icon-expand {
+    display: none; /* Sembunyikan ikon panah */
+}
+.block_openai_chat.expanded .icon-close {
+    display: flex; /* Tampilkan ikon silang */
+}
+
+/* ═══════════════════════════════════════════
+   MODE EXPANDED (POPOUT)
+═══════════════════════════════════════════ */
+.block_openai_chat.expanded {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 80vh;
+    z-index: 9999;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    outline: 100vw solid #00000029;
+}
+
+.block_openai_chat.expanded .card-body {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.block_openai_chat.expanded #openai_chat_log {
+    flex: 1;
+    max-height: unset;
+    height: calc(80vh - 140px);
+    overflow-y: scroll;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+}
+
+.block_openai_chat.expanded #control_bar {
+    position: fixed;
+    bottom: 1rem;
+    width: calc(600px - 2rem);
+    gap: 0.5rem;
+}
+
+.block_openai_chat.expanded .openai_message {
+    width: fit-content !important;
+}
+
+/* ═══════════════════════════════════════════
+   DISABLED STATE
+═══════════════════════════════════════════ */
+.block_openai_chat.disabled,
+.block_openai_chat .disabled {
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════
+   RECORDING DOT
+═══════════════════════════════════════════ */
+.block_openai_chat .recording {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: #ff0000;
+    position: absolute;
+    top: 1.5rem;
+    right: 3rem;
+    border-radius: 99rem;
+    filter: opacity(0.5);
+    animation: block_openai_chat_thinking 3s linear infinite;
+}
+
+/* ═══════════════════════════════════════════
+   REPORT
+═══════════════════════════════════════════ */
+.block_openai_chat .report_container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE (Mobile)
+═══════════════════════════════════════════ */
+@media screen and (max-width: 750px) {
+    .drawerheader {
+        pointer-events: none;
+    }
+    .drawerheader button {
+        pointer-events: all;
+    }
+    .block_openai_chat.expanded {
+        transform: unset;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+    }
+    .block_openai_chat.expanded #control_bar {
+        width: calc(100vw - 2rem);
+    }
+    .block_openai_chat.expanded .openai_input_popout_btn {
+        right: 3rem;
+    }
+    .block_openai_chat.expanded .recording {
+        right: 5.5rem;
+    }
+    .block_openai_chat .report_container {
+        flex-direction: column;
+    }
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════ */
+@keyframes block_openai_chat_popup {
+    0%   { opacity: 0; transform: translateY(5px); }
+    70%  { opacity: 1; transform: translateY(-2.5px); }
+    85%  { transform: translateY(2.5px); }
+    100% { transform: translateY(0); }
+}
+
+@keyframes block_openai_chat_thinking {
+    0%   { opacity: 1; }
+    50%  { opacity: 0.25; }
+    100% { opacity: 1; }
+}
+
+@keyframes block_openai_chat_fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
